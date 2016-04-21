@@ -1,0 +1,97 @@
+<!-- Load the jQuery and jQuery UI libraries. -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<!-- Custom client-side JavaScript code. -->
+<script>
+
+  // When the page loads.
+  //$(function() {
+  $(document).ready(function() {
+    $('#duplicate-assignment').bind('submit', onDuplicateFormSubmit);
+    loadCourses();
+  });
+
+  /**
+   * Load the available courses.
+   */
+  function loadCourses() {
+    google.script.run.withSuccessHandler(showCourses)
+        .withFailureHandler(showError)
+        .getCourses();
+  }
+
+  /**
+   * Show the returned classrooms in the dropdown box.
+   * @param {Array.<Object>} courses. The classes to show.
+   */
+  function showCourses(courses) {
+
+    var select = $('#classroom-id');
+    select.empty();
+    if (courses.length == 0) {
+      var option = $('<option>').text("No classes found");
+      select.append(option);
+    } else {
+      courses.forEach(function(course) {
+        console.log ("found a class " + course.name);
+        var option = $('<option>')
+            .attr('value', course.id)
+            .text(course.name);
+        select.append(option);
+      });
+    }
+  }
+
+  /**
+   * A callback function that runs when the new duplicate-assignment is submitted.
+   */
+  function onDuplicateFormSubmit() {
+    $('#duplicate-button').prop('disabled', true);
+    var classroomId = $('#classroom-id').val();
+    // replace https://drive.google.com/open?id=0B9GuP4QPX1DnT0ZFMU82UVpHYnc with just the ID
+    var regex = /(.*)id=(.*)/;
+    var matches = $('#file-id').val().match(regex);
+    if (matches.length < 2) {
+      alert ("Please paste in a valid link ID. For example, https://drive.google.com/open?id=0B9GuP4QRGX4nT0ZFMU82UVpHYnc");
+      $('#duplicate-button').removeProp('disabled');
+      return false;
+    }  
+    var fileId = matches[2];
+    //alert (" file id = " + fileId);
+    
+    var readOnly = $('input[name="permission"]:checked').val();
+    //alert (" found : cfr " + classroomId + " " + fileId + " " + readOnly );
+    $("#duplicate-result").append("Running ...");
+    google.script.run.withSuccessHandler(function(result) {
+      console.log(" Result = " + result.status);
+      if (result.status != "Success") {
+        $("#duplicate-result").append("<b>" + result.status + "</b>");
+      } else {
+        if (result.result.students.length > 0) {
+          studentList = result.result.students.join(", ");
+          $("#duplicate-result").append("<span class='label label-success'><b>" + result.status + "</b><br>Your duplicated assignment is located in your <a href='https://drive.google.com/drive/u/0/my-drive'>root directory</a>.<br>The following students have received a copy of the file: " + studentList + "</span>");
+          // this <a href='" + result.result.folderURL + "'>folder</a>
+        } else {
+          $("#duplicate-result").append("<span class='label label-warning'><b>" + result.status + "</b>. No action as either the file is already copied or the students already have permission.</span>");
+        }
+      }
+      $('#duplicate-button').removeProp('disabled');
+    }).withFailureHandler(showError)
+      .createAssignment(classroomId, fileId, "", readOnly);
+      
+    $('#duplicate-button').removeProp('disabled');
+    return false;
+  }
+
+  /**
+   * Logs an error message and shows an alert to the user.
+   */
+  function showError(error) {
+    console.log(error);
+    document.getElementById("duplicate-result").textContent = "<span class='label label-danger'>An error has occurred, please try again.</span>";
+  }
+
+</script>
