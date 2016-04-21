@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--< ? != HtmlService.createHtmlOutputFromFile('Stylesheet').getContent(); ?>-->
+  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container">
+<div class="row">
+<div class="col-md-10">
+<div class="panel panel-default">
+  <div class="panel-body">
+  <div class="page-header">
+    <h1>Assignment Duplicator <small>- version 1.0</small></h1>
+  </div>
+
+  <p>
+  The Duplicator will create a unique copy of a GoogleDrive file for every student in your GoogleClass.</p>
+  <p>The duplicated assignments will be placed in a new folder located in your <a href="https://drive.google.com/drive/u/0/my-drive">root directory</a>. 
+  Each copy will be renamed with the student's name pre-pended and appropriate permissions
+  added to allow the students to retreive the file.</p>
+  <p>Each student will also receive an email with a link to their individual copy of the file.
+  </p>
+
+  <form name="duplicate-assignment" id="duplicate-assignment">
+    <div class="form-group"> 
+
+    <label>1. Enter the file link URL</label>
+    <div class="input-group">
+      <input type="url" class="form-control" pattern="https?://.+\?id=.+" placeholder="Link URL 'https://...?id=ABCDEF...'" name="fileId" id="file-id" required>
+    </div>
+    
+
+    <a class="btn btn-default" role="button" data-toggle="collapse" href="#fileURLExample">
+      Show me how to find the File ID URL
+    </a>
+    <div class="collapse" id="fileURLExample">
+      <div class="well">
+      <p>To retrieve the file's ID URL, open Google Drive, locate the file and right-click. 
+      Select <code>File -> Get Link</code> and copy the entire link URL.</p>
+      <p>A file ID URL looks like this, <br> <kbd>https://drive.google.com/open?id=1NAbNGuq9409NTBWHp_bRQyTw26LMQp705FExQ9UyFes</kbd></p>
+      </div>
+    </div>
+    
+    </div>
+    
+    <div class="form-group">
+      <label>2. Select a Classroom</label>
+      <select required class="form-control" id="classroom-id" name='classroomId' value="classroomId">
+        <option>Loading...</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>3. Select Sharing Permission</label>
+      <div class="radio">
+        <label><input type="radio" name="permission" value="1">Read-Only</label>
+        <label><input type="radio" name="permission" value="0" checked>Read-Write</label>
+      </div>
+      <div class="help-block">
+        This permission will apply to the file you're sharing with the student. If you choose read-only then the student will need to request access to edit the file - which you - the teacher - will have to grant. If you select read-write then the student will be able to edit the file immediately.
+      </div>
+    </div>
+    <br>
+    <div class="form-group">
+    <label>4. Duplicate the File</label>
+    <p> Click here to begin the file duplication. Note that this action will take a minute or two. You can visit your root folder to watch
+    as the files are added</p>
+    <button type="submit" class="btn btn-primary" name="duplicate" id="duplicate-button" value="Duplicate">Duplicate the assignment</button>
+    </div>
+  </form> 
+  
+  <br>
+  <div class="well">
+    <div id="duplicate-result">
+    </div>
+      </div>
+    <div class="panel-footer">
+      <p>Copyright - KCDSB - IT Department - Contact: <a href="mailto:cdebbo@kcdsb.on.ca?Subject=Assignment%20Duplicator" target="_top">Craig Debbo</a></p>
+      <p><small>This app is managed by gafeitapps@kcedu.ca and is titled AssignmentDuplicator</small></p>
+    </div>
+</div>
+
+    </div>
+  
+</div>
+
+<div class="col-md-2">
+</div>
+
+</div>
+</div>
+
+
+<!-- <script src="https://apis.google.com/js/api.js?onload=onApiLoad"></script> -->
+<?!= HtmlService.createHtmlOutputFromFile('codejs').getContent(); ?>
+
+</body>
+</html>
